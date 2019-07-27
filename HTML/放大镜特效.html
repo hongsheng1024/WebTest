@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>放大镜特效</title>
+
+    <style>
+        *{
+            margin: 0px;
+            padding:0px;
+        }
+        .box{
+            width: 350px;
+            height: 350px;
+            margin:100px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .big{
+            width: 400px;
+            height: 400px;
+            position: absolute;
+            top: 0px;
+            left:360px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            display: none;
+        }
+        .mask{
+            width: 175px;
+            height: 175px;
+            background: rgba(255, 255, 0, 0.4);
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            cursor: move;
+            display: none;
+        }
+        .small{
+            position: relative;
+        }
+        .box img{
+            vertical-align: top;
+        }
+        #bigBox > img{
+            position: absolute;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div id="box" class="box">
+        <div id="smallBox" class="small">
+            <img src="../Image/001.jpg" width="350px" alt="">
+            <div class="mask" id="mask"></div>
+        </div>
+
+        <div id="bigBox" class="big">
+            <img id="bigImg" src="../Image/0001.jpg" width="800px" alt="">
+        </div>
+    </div>
+
+    <script>
+        var box = document.getElementById("box");
+        var smallBox = document.getElementById("smallBox");
+        var mask = document.getElementById("mask");
+        var bigBox = document.getElementById("bigBox");
+        var bigImg = document.getElementById("bigImg");
+
+        smallBox.onmouseover = function () {
+            mask.style.display = "block";
+            bigBox.style.display = "block";
+        }
+
+        smallBox.onmouseout = function () {
+            mask.style.display = "none";
+            bigBox.style.display = "none";
+        }
+
+        //鼠标在小盒子中移动的时候 获取位置 并移动mask
+        smallBox.onmousemove = function (event) {
+            var event = event || window.event;
+            //页面中的位置
+            var pageX = event.pageX || event.clientX + document.documentElement.scrollLeft;
+            var pageY = event.pageY || event.clientY + document.documentElement.scrollTop;
+            //在盒子中的位置
+            var boxX = pageX - box.offsetLeft;
+            var boxY = pageY - box.offsetTop;
+            //设置遮罩位置
+            var maskX = boxX - mask.offsetWidth/2;
+            var maskY = boxY - mask.offsetHeight/2;
+            //限制遮罩位置
+            if (maskX < 0){
+                maskX = 0;
+            }
+            if (maskX > smallBox.offsetWidth - mask.offsetWidth){
+                maskX = smallBox.offsetWidth - mask.offsetWidth;
+            }
+
+            if (maskY < 0) {
+                maskY = 0;
+            }
+            if (maskY > smallBox.offsetHeight - mask.offsetHeight) {
+                maskY = smallBox.offsetHeight - mask.offsetHeight;
+            }
+            mask.style.left = maskX + "px";
+            mask.style.top = maskY + "px";
+
+            //根据比例移动大图片
+            //和遮罩成比例 而且是反方向
+            bigImg.style.left = -maskX * 2 + "px";
+            bigImg.style.top = -maskY * 2 + "px";
+        }
+
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

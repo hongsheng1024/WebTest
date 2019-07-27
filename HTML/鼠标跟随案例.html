@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>鼠标跟随案例</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        img{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+    </style>
+</head>
+<body>
+    <img src="../Image/img.jpg" alt="" width="50" id="pic">
+    <script>
+        var pic = document.getElementById("pic");
+        var timer = null;
+
+        //点击文档 获取当时鼠标的位置 让图片过来
+        document.onclick = function (event) {
+            clearInterval(timer);
+            var event = event || window.event; //兼容性处理
+            var pageX = event.pageX || event.clientX + document.documentElement.scrollLeft;//鼠标点击页面时的水平位置
+            var pageY = event.pageY || event.clientY + document.documentElement.scrollTop;//鼠标点击页面时的数值位置
+
+            timer = setInterval(function () {
+                var leaderX = pic.offsetLeft;//图片的水平位置
+                var leaderY = pic.offsetTop;//图片的竖直位置
+                var targetX = pageX; //水平目标
+                var targetY = pageY; //竖直目标
+
+                var stepX = (targetX - leaderX)/10;
+                var stepY = (targetY - leaderY)/10;
+                stepX = stepX > 0 ? Math.ceil(stepX) : Math.floor(stepX);
+                stepY = stepY > 0 ? Math.ceil(stepY) : Math.floor(stepY);
+
+                leaderX = leaderX + stepX;
+                leaderY = leaderY + stepY;
+                pic.style.left = leaderX + "px";
+                pic.style.top = leaderY + "px";
+
+                if (leaderX == targetX && leaderY == targetY){
+                    clearInterval(timer);
+                }
+            }, 15);
+        }
+    </script>
+
+</body>
+</html>
+
+
+<!--
+        //取消冒泡的兼容写法
+        if (event && event.stopPropagation) {
+            event.stopPropagation();
+        } else {
+            event.cancelBubble = true;
+        }
+
+//添加事件监听器 事件类型 事件处理函数 是否使用捕获
+    btn2.addEventListener("click", function () {
+        console.log("第一个人写的代码");
+    }, false);
+
+    btn2.addEventListener("click", function () {
+        console.log("第二个人写的代码");
+    }, false)
+
+    //通过这种形式 后面的不会把前面的覆盖掉
+    //IE678不兼容
+
+    btn1.onclick = null;//这样就移除了
+
+    btn2.addEventListener("click", fn, false);
+    //btn2.removeEventListener("click", fn, false);//通过这种方式能够移除事件
+
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

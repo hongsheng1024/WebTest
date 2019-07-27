@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动画框架</title>
+    <style>
+
+        *{
+            padding: 0px;
+            margin:0px;
+        }
+        #demo{
+            width: 100px;
+            height: 100px;
+            background-color: red;
+            position: absolute;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button id="btn">按钮</button>
+    <div id="demo"></div>
+
+    <script>
+
+        var demo = document.getElementById("demo");
+        var btn = document.getElementById("btn");
+
+        btn.onclick = function () {
+            //animate01(demo, "top", 400);//left width height
+//            animate02(demo, {
+//                "width":200,
+//                "height":200
+//            });
+//            animate03(demo, {
+//                "width":200,
+//                "height":200
+//            }, fnMethod);
+            animate03(demo, {"opacity": 0.3},function(){
+                animate03(demo,{"width":200});
+            });
+
+        }
+
+        //对任意对象的任意属性进行修改，改为目标值
+        function animate01(obj, attr, target) {
+            clearInterval(obj.timer);
+            obj.timer = setInterval(function () {
+
+                var leader = parseInt(getStyle(obj, attr)) || 0;
+                var step = (target - leader)/10;
+                step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                leader = leader + step;
+                obj.style[attr] = leader + "px";
+                if (leader == target){
+                    clearInterval(obj.timer);
+                }
+
+            }, 15);
+        }
+
+        //改进  多个数值属性
+        function animate02(obj, json) {
+            clearInterval(obj.timer);
+            obj.timer = setInterval(function () {
+
+                var flag = true;
+                for(var k in json){
+                    var leader = parseInt(getStyle(obj, k)) || 0;
+                    var target = json[k];
+                    var step = (target - leader)/10;
+                    step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                    leader = leader + step;
+                    obj.style[k] = leader + "px";
+                    if (leader != target){
+                        //只要一个没达到，就不能清理
+                        flag = false;
+                    }
+                }
+
+                //所有属性都达到了目标 就可以清理定时器
+                if (flag){
+                    clearInterval(obj.timer);
+                }
+                console.log("代码执行中");
+
+            }, 15);
+        }
+
+        //添加回调函数
+        function animate03(obj, json, fn) {
+            clearInterval(obj.timer);
+            obj.timer = setInterval(function () {
+
+                var flag = true;
+                for(var k in json){
+                    if (k == "opacity") {
+                        var leader = parseInt(getStyle(obj, k) * 100);
+                        //透明度是小数 为了运算方便 先扩大一百倍 并转换成正数
+                        //0-1 0.33 * 100
+                        var target = json[k] * 100;
+                        var step = (target - leader) / 10;
+                        step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                        leader = leader + step;
+                        obj.style[k] = leader / 100;
+                    } else if (k == "zIndex") {//如果是层级
+                        obj.style[k] = json[k];//直接让对象的层级达到目标值
+                    } else {
+                        var leader = parseInt(getStyle(obj, k)) || 0;
+                        var target = json[k];
+                        var step = (target - leader) / 10;
+                        step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                        leader = leader + step;
+                        obj.style[k] = leader + "px";
+                    }
+                    if (leader != target){
+                        //只要一个没达到，就不能清理
+                        flag = false;
+                    }
+                }
+
+                console.log("代码执行中");
+                //所有属性都达到了目标 就可以清理定时器
+                if (flag){
+                    clearInterval(obj.timer);
+                    if (fn){
+                        fn();
+                    }
+                }
+
+            }, 15);
+        }
+
+        function fnMethod() {
+            console.log("回调函数执行了");
+        }
+
+
+        function getStyle(obj, attr) {
+            if (obj && obj.currentStyle){
+                return obj.currentStyle[attr];//IE6 7 8
+            }else {
+                return window.getComputedStyle(obj, null)[attr];
+            }
+        }
+
+    </script>
+
+
+</body>
+</html>
+
+
+<!--
+    scrollHeight：全部内容高度（包括多余的内容）
+    offsetHeight：盒子高度（内容高度 + paddingH + borderH）
+    scrollTop：内容滚动高度
+
+    console.log(document.title);
+    console.log(document.body);
+    console.log(document.documentElement);
+    console.log("高：" + demo.style.height);
+    console.log("高：" + demo.style[height]);
+
+
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

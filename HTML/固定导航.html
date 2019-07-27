@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>固定导航</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        img{
+            vertical-align: top;
+        }
+        .main{
+            margin:0 auto;
+            width: 1000px;
+        }
+        .fix{
+            position: fixed;
+            top:0;
+            left:0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top" id="topPart">
+        <img src="../Image/top.png">
+    </div>
+    <div class="nav" id="navBar">
+        <img src="../Image/nav.png">
+    </div>
+    <div class="main" id="mainPart">
+        <img src="../Image/main.png">
+    </div>
+
+    <script src="../Common/common.js"></script>
+    <script>
+        var topPart = document.getElementById("topPart");//顶部
+        var navBar = document.getElementById("navBar");//导航栏
+        var mainPart = document.getElementById("mainPart");//底部
+
+        //页面滚动的时候判断scroll().top 的数值 是否大于 topPart的高度
+        //如果大于了 就改变navBar的样式
+        //如果小于了 就恢复原来的
+        window.onscroll = function () {
+            console.log(scroll().top + "--" + topPart.offsetHeight);
+            if (scroll().top > topPart.offsetHeight){
+                navBar.className = "nav fix";
+                //为了防止下面的页面突然掉上来
+                //给下面的页面加一个padding-top
+                mainPart.style.paddingTop = navBar.offsetHeight + "px";
+            }else {
+                navBar.className = "nav";
+                mainPart.style.paddingTop = "0px";
+            }
+        }
+
+
+
+    </script>
+
+</body>
+</html>
+
+<!--
+
+
+
+-->
+
+
+
+
+
+

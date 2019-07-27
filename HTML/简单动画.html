@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>简单动画</title>
+</head>
+
+<style>
+    *{
+        margin:0px;
+        padding: 0px;
+    }
+    #demo{
+        width: 100px;
+        height: 100px;
+        background-color: yellow;
+        position: relative;
+    }
+</style>
+
+<body>
+<!--1、移动-->
+<button id="btn">移动</button>
+<div id="demo">demo</div>
+
+<!--2、移动优化：函数封装-->
+<button id="btn01">移动200</button>
+<button id="btn02">移动400</button>
+
+<script>
+    <!--移动-->
+    var btn = document.getElementById("btn");
+    var demo = document.getElementById("demo");
+    var timer = null;
+    btn.onclick = function () {
+        timer = setInterval(function () {
+            var target = 400;
+            var leader = demo.offsetLeft;
+            var step = 10;
+            leader = leader + step;
+            if (demo.offsetLeft < target){
+                demo.style.left = leader + "px";
+            }else {
+                clearInterval(timer);
+            }
+        }, 15);
+    }
+
+    <!--移动优化：函数封装-->
+    var btn01 = document.getElementById("btn01");
+    var btn02 = document.getElementById("btn02");
+    btn01.onclick = function () {
+        animate(demo, 200);
+    }
+    btn02.onclick = function () {
+        animate(demo, 400);
+    }
+
+    function animate(obj, target) {
+        //先提前清除一下定时器
+        clearInterval(obj.timer);
+        obj.timer = setInterval(function () {
+            var leader = obj.offsetLeft;
+            var step = 10;
+            step = obj.offsetLeft < target ? step : -step;
+            leader = leader + step;
+            if (Math.abs(obj.offsetLeft - target) > Math.abs(step)){
+                obj.style.left = leader + "px";
+            }else {
+                obj.style.left = target + "px";
+                clearInterval(obj.timer);
+            }
+        }, 15);
+    }
+
+
+</script>
+</body>
+</html>

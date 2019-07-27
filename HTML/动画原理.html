@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动画原理</title>
+
+    <style>
+        *{
+            margin:0px;
+            padding:0px;
+        }
+        ul{
+            list-style: none;
+        }
+        ol{
+            list-style: none;
+        }
+        img{
+            vertical-align: top;
+        }
+        .box{
+            width:490px;
+            height:170px;
+            margin:100px auto;
+            padding: 5px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .inner{
+            width: 490px;
+            height: 170px;
+            background-color: pink;
+            position: relative;
+            overflow: hidden;
+        }
+        .inner ul{
+            width: 1000%;
+            height: 100%;
+            position: absolute;
+            top:0px;
+            left: 0px;
+        }
+        .inner li{
+            float: left;
+        }
+        .square{
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+        }
+        .square span{
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-color: #fff;
+            text-align: center;
+            line-height: 16px;
+            cursor: pointer;
+        }
+        .square span.current{
+            background-color: orange;
+            color: #fff;
+        }
+        #arr{
+            display: none;
+        }
+        #arr span{
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity: 0.3;
+            border: 1px solid #fff;
+            background-color: #000;
+        }
+        #arr #right{
+            right: 5px;
+            left: auto;
+        }
+
+        /*轮播图优化*/
+        .all{
+            width: 500px;
+            height: 200px;
+            padding: 7px;
+            border:1px solid #ccc;
+            margin: 100px auto;
+            position: relative;
+        }
+        .screen{
+            width: 500px;
+            height: 200px;
+            position: relative;
+            /*overflow: hidden;*/
+        }
+        .screen ul{
+            position: absolute;
+            left: 0;
+            top: 0px;
+            width: 1000%;
+        }
+        .screen li{
+            float: left;
+            width: 500px;
+            height: 200px;
+        }
+        .all ol{
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            line-height: 20px;
+            text-align: center;
+        }
+        .all ol li{
+            float: left;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border:1px solid #ccc;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .all ol li.current{
+            background-color: yellow;
+        }
+        #arr01{
+            display: none;
+        }
+        #arr01 span{
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            background-color: #000;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity:0.3;
+            border: 1px solid #fff;
+        }
+        #arr01 #right01{
+            right: 5px;
+            left: auto;
+        }
+
+
+    </style>
+
+</head>
+<body>
+    <!--简单轮播图-->
+    <div class="box" id="box">
+        <div class="inner">
+            <ul>
+                <li><a href="#"><img src="../Image/01.jpg" alt=""></a></li>
+                <li><a href="#"><img src="../Image/02.jpg" alt=""></a></li>
+                <li><a href="#"><img src="../Image/03.jpg" alt=""></a></li>
+                <li><a href="#"><img src="../Image/04.jpg" alt=""></a></li>
+                <li><a href="#"><img src="../Image/05.jpg" alt=""></a></li>
+            </ul>
+            <div class="square">
+                <span class="current">1</span>
+                <span>2</span>
+                <span>3</span>
+                <span>4</span>
+                <span>5</span>
+            </div>
+        </div>
+        <div id="arr">
+            <span id="left">&lt;</span>
+            <span id="right">&gt;</span>
+        </div>
+    </div>
+
+    <!--轮播图优化-->
+    <div class="all" id="box01">
+        <div class="screen">
+            <ul>
+                <li><img src="../Image/1.jpg" width="500" height="200"></li>
+                <li><img src="../Image/2.jpg" width="500" height="200"></li>
+                <li><img src="../Image/3.jpg" width="500" height="200"></li>
+                <li><img src="../Image/4.jpg" width="500" height="200"></li>
+                <li><img src="../Image/5.jpg" width="500" height="200"></li>
+            </ul>
+            <ol>
+            </ol>
+        </div>
+        <div id="arr01">
+            <span id="left01">&lt;</span>
+            <span id="right01">&gt;</span>
+        </div>
+    </div>
+
+    <script>
+        //简单轮播图
+        var box = document.getElementById("box");
+        var inner = box.children[0];
+        var ul = inner.children[0];
+        var square = inner.children[1];
+        var squares = square.children;
+
+        var arr = document.getElementById("arr");
+        var left = document.getElementById("left");
+        var right = document.getElementById("right");
+
+
+        var imgWidth = inner.offsetWidth;
+        for(var i = 0; i < squares.length; i++){
+            //给每一个按钮绑定自定义属性
+            squares[i].index = i;
+            //鼠标经过当前按钮，当前按钮高亮，其它还原
+            squares[i].onmouseover = function () {
+                //还原
+                for(var j = 0; j < squares.length; j++){
+                    squares[j].className = "";
+                }
+                //当前高亮
+                this.className = "current";
+                var target = -this.index * imgWidth;
+                animate(ul, target);
+            }
+        }
+
+        function animate(obj, target) {
+            clearInterval(obj.timer);
+            obj.timer = setInterval(function () {
+                var leader = obj.offsetLeft;
+                var step = 25;
+                step = obj.offsetLeft < target ? step : -step;
+                leader = leader + step;
+                if (Math.abs(obj.offsetLeft - target) > Math.abs(step)){
+                    obj.style.left = leader + "px";
+                }else {
+                    obj.style.left = target + "px";
+                    clearInterval(obj.timer);
+                }
+            }, 15)
+        }
+
+        box.onmouseover = function () {
+            arr.style.display = "block";
+        }
+        box.onmouseout = function () {
+            arr.style.display = "none";
+        }
+
+        var pic = 0;
+        left.onclick = function () {
+            if(pic > 0){
+                pic--;
+                var target = -pic * imgWidth;
+                animate(ul, target);
+            }
+        }
+        right.onclick = function () {
+            if (pic < squares.length - 1){
+                pic++;
+                var target = -pic * imgWidth;
+                animate(ul, target);
+            }
+        }
+
+        //轮播图优化
+        var box01 = document.getElementById("box01");
+        var screen = box01.children[0];
+        var ul01 = screen.children[0];
+        var ulLis = ul01.children;
+        var ol = screen.children[1];
+        var arr01 = document.getElementById("arr01");
+        var left01 = document.getElementById("left01");
+        var right01 = document.getElementById("right01");
+
+        var imgWidth01 = screen.offsetWidth;
+        var picIndex = 0; //当前应该显示图片的索引
+        var squareIndex = 0; //按钮索引
+
+        //根据图片数量动态生成按钮
+        for(var i = 0; i < ulLis.length; i++){
+            var li = document.createElement("li");
+            li.innerHTML = i + 1; //设置编号
+
+            ol.appendChild(li);
+        }
+        //默认选中第一张
+        var olLis = ol.children;
+        olLis[0].className = "current";
+        //动态生成最后一张图片  克隆节点 而且是深度克隆
+        var firstImg = ulLis[0].cloneNode(true);
+        ul01.appendChild(firstImg);
+
+        for(var j = 0; j < olLis.length; j++){
+            olLis[j].index = j;
+            olLis[j].onmouseover = function () {
+                for(var k = 0; k < olLis.length; k++){
+                    olLis[k].className = "";
+                }
+                this.className = "current";
+                var target = -this.index * imgWidth01;
+                console.log(target);
+                animate(ul01, target);
+                squareIndex = picIndex = this.index;
+            }
+        }
+
+        left01.onclick = function () {
+            //判断如果是最后一张就该跳了
+            if (picIndex == 0){
+                ul01.style.left = -(ulLis.length - 1) * imgWidth01 + "px";
+                //图片的位置是最后一张图片之前的所有图片的宽度，而且是负数
+                picIndex = ulLis.length - 1; //变成最后一张图片的索引
+            }
+            picIndex--;
+            var target = -picIndex * imgWidth01;
+            animate(ul01, target);//移动
+
+            //更改按钮位置
+            if (squareIndex > 0){
+                squareIndex--;
+            }else {
+                squareIndex = olLis.length - 1;
+            }
+            for(var i = 0; i < olLis.length; i++){
+                olLis[i].className = "";
+            }
+            olLis[squareIndex].className = "current";
+        }
+
+        right01.onclick = function () {
+            playNext();
+        }
+        box01.onmouseover = function () {
+            arr01.style.display = "block";
+            //clearInterval(timer);
+        }
+        box01.onmouseout = function () {
+            arr01.style.display = "none";
+            //timer = setInterval(playNext, 1000);
+        }
+
+        //添加自动播放
+        //timer = setInterval(playNext, 1000);
+
+        function playNext() {
+            //判断 如果是最后一张就该跳了
+            if (picIndex == ulLis.length - 1){
+                ul.style.left = "0px";
+                picIndex = 0;
+            }
+            picIndex++;
+            var target = -picIndex * imgWidth01;
+            animate(ul01, target);
+
+            //按钮位置更新
+            //判断如果小于最后一个按钮的索引才能++，否则等于0
+            if (squareIndex < olLis.length - 1){
+                squareIndex++;
+            }else {
+                squareIndex = 0;
+            }
+            for(var i = 0; i < olLis.length; i++){
+                olLis[i].className = "";
+            }
+            olLis[squareIndex].className = "current";
+        }
+
+
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
